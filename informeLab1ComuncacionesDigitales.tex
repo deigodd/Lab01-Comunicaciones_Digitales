@@ -1,0 +1,380 @@
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amssymb,amsmath,amsthm,amsfonts}
+\usepackage{calc}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{gensymb}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{1.0 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{pst-all}
+\usepackage{pstricks}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Laboratorio 1 - Pulse Amplitude Modulation (PAM) y Pulse Code Modulation (PCM)}					% Titulo
+\author{Aaron Pozas Oyarce \linebreak
+Diego Pérez Carrasco\linebreak
+\newline
+\bttext{Profesor: \linebreak Marcos Fantoval}}
+\date{07/04/2025}% Fecha
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\usepackage{subfigure}
+\usepackage{gensymb}
+\cfoot{\thepage}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+	\centering
+    \vspace*{0.0cm}
+    \includegraphics[width=0.3\textwidth]{images/logo (1).jpg}\\
+    \textsc{\LARGE Universidad Diego Portales}\\[0.2cm]
+	\textsc{\large ESCUELA DE INFORMÁTICA \& TELECOMUNICACIONES}\\[2cm]
+	\textsc{\LARGE COMUNICACIONES DIGITALES}\\[1cm]
+	
+    \rule{\linewidth}{0.2mm} \\[0.4cm]
+    {\huge \bfseries Laboratorio 1 - Pulse Amplitude Modulation (PAM) y Pulse Code Modulation (PCM)}\\
+    \rule{\linewidth}{0.2mm} \\[1.5cm]
+	
+    {\Large \textbf{Autores:}}\\
+    Aaron Pozas Oyarce \\
+    Diego Pérez Carrasco \\[1cm]
+	
+    {\Large \textbf{Profesor:}}\\
+    Marcos Fantoval \\[1.5cm]
+    
+	{\large 07 de abril de 2025}\\ [0.2cm]
+    \href{https://github.com/deigodd/Lab01-Comunicaciones_Digitales}{Link repositorio} \\[1cm]
+\end{titlepage}
+
+
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introducción}
+
+En el presente informe se analiza el proceso de codificación de formas de onda analógicas dentro de señales digitales de banda base, centrándose en la implementación y análisis de los esquemas de modulación por amplitud de pulsos (PAM) y modulación por codificación de pulsos (PCM). Para ello, se llevaron a cabo dos actividades, una actividad previa y la actividad principal del laboratorio.
+
+En la primera, se buscó replicar el funcionamiento del bloque de Procesamiento de Señales, el cual adapta la señal de entrada para que sea apta para la modulación, volviéndola más robusta y menos vulnerable a interferencias. Para la codificación de estas señales \textbf{m(t)}, que representan la información de entrada, se empleó la herramienta MATLAB. Posteriormente en la actividad principal, se exploró el proceso de conversión analógico-digital mediante la implementación de esquemas de codificación en MATLAB, permitiendo analizar el comportamiento y características de las señales moduladas.
+
+Esta instancia de laboratorio permite comprender la importancia de la digitalización de señales y su impacto en la transmisión eficiente en sistemas de comunicaciones digitales.
+
+\section{Metodología}
+Los pasos a seguir para concretar el desarrollo de las actividades consistió, en su completitud, de desarrollar código, asegurando los siguientes puntos para cada actividad:
+
+\subsection{Actividad Previa}
+Primero, se crearon los componentes principales que iba a poseer la señal m(t), considerando lo siguiente: frecuencia, amplitud, período de muestreo, largo de la señal, tiempo de muestreo, entre otros. Teniendo todos los componentes, 
+se procedió a crear la señal m(t), quedando matemáticamente de la siguiente manera:
+
+$$m(t)=sin(2 \cdot \pi \cdot f \cdot t)$$
+
+Posteriormente, se implementaron las dos variantes de muestreo de la señal PAM (Pulso de Amplitud Modulada):
+
+\begin{itemize}
+    \item \textbf{Muestreo Natural:} Para el muestreo natural de la señal PAM, se generaron pulsos rectangulares periódicos representados por el vector $s\_nat$, manteniéndose activo en cada pulso por un número de muestras determinado por la duración del ciclo de trabajo. Estos pulsos fueron ubicados cada cierto número de muestras, correspondiente al número de muestras original o teórico. Luego se multiplicó la señal \textbf{m(t)} con \textbf{s\_nat}, generando así la señal PAM natural \textbf{($m\_t\_nat$)}. 
+    
+    \item \textbf{Muestreo Instantáneo:} Para el muestreo instantáneo, se generó un vector de ceros del mismo tamaño que la señal, mismo en el que se iban a ir colocando los índices de muestreo de la señal m(t), generando pulsos de diferentes amplitudes. Estos pulsos, de manera concatenada generarían la señal PAM instantánea \textbf{($m\_t\_inst$)}.
+\end{itemize}
+
+\subsection{Actividad Principal}
+Usando las señales generadas en la actividad previa, se procedió a generar las Transformadas de cada una se las señales, se realizó la modulación por codificación de pulsos (PCM) y el error de cuantización, quedando de la siguiente manera:
+
+\begin{itemize}
+    \item \textbf{Transformadas de Fourier:} Para cada una de las transformadas, se utilizó la función \textbf{FFT}, la cual permite obtener la transformada de Fourier de cualquier señal. Además, se generó la frecuencia, dominio en el cual se maneja esta herramienta de Fourier.
+
+    \item \textbf{Modulación por Codificación de Pulsos (PCM):} Para la modulación por codificación de pulsos, se realizó un proceso de 
+    cuantización uniforme de la señal muestreada. Para ello, se definió el número de bits (N) por palabra PCM, el cual es configurable.
+    Luego se definió la cantidad de niveles de cuantización, que es igual a $2^N$. Posteriormente, se definieron el mínimo y máximo de 
+    la señal \textbf{m\_t\_inst} para establecer el rango de cuantización. A partir de esto, se determinó el paso de cuantización ($delta$), 
+    que representa la diferencia entre cada nivel de cuantización. Finalmente, cada muestra fue aproximada al nivel de cuantización más cercano 
+    mediante una formula, generando así la señal cuantizada \textbf{m\_t\_cuant}.
+
+    \item \textbf{Error de Cuantización:} El error de cuantización se calculó como la diferencia entre la señal muestreada \textbf{m\_t\_inst} y la señal cuantizada \textbf{m\_t\_cuant}. Este error representa la discrepancia entre el valor real de la señal y el valor cuantizado.
+    
+\end{itemize}
+
+Teniendo todos los códigos que generan tanto las señales (original, natural e instantánea), transformadas, PCM y errores, se procedió a graficar cada una de las señales generadas, tanto en el dominio del tiempo como en el dominio de la frecuencia (Ver código\ref{lst:codigo} del anexo).
+
+\newpage
+
+\section{Resultados y Análisis}
+Al graficar todas las señales y sus derivados, se apreciaron diferentes puntos de las mismas en relación a su comportamiento, de los cuales se apreció lo siguiente:
+
+\subsection{Actividad previa: Modulación PAM de una señal sinusoidal: }
+\begin{enumerate}
+    \item \textbf{Señal sinusoidal original: } De los resultados del gráfico (\ref{fig:signals_time}), se puede verificar que la señal 
+    producida según los datos estipulados en la guía de laboratorio son completamente acertados en relación al comportamiento y apariencia esperados (la naturaleza sinusoide). Por otra parte, desde la figura podemos observar la amplitud de 1, la duración de la señal, entre otros atributos que fueron configurados para obtener específicamente esta sinusoide. 
+
+    \item \textbf{Señal sinusoide con muestreo natural:} En la figura (\ref{fig:signals_time}) se observa la modulación por amplitud de pulso (PAM) con muestreo natural. Para este apartado se estableció una frecuencia de muestreo y un ciclo de trabajo como se explicó con anterioridad. Se puede notar que los montículos mantienen la forma de la señal original siguiendo la variación de la señal senoidal, interrumpiéndose por pequeños períodos nulos. Además la amplitud de los montículos varía en función de la amplitud de la señal en los instantes de muestreo, permitiendo conservar la información de la señal. Esto ocurre ya que en sistemas digitales se trabajan con datos discretos y finitos para acotar y trabajar bien con estos datos, simulando así el comportamiento de una señal análoga de con intervalos discretos.
+
+    \item \textbf{Señal sinusoide con muestreo instantaneo:} Los resultados de este apartado se encuentran en la figura (\ref{fig:signals_time}). Se 
+    observa que el muestro instantáneo toma muestras discretas de la sinusoide original en instantes específicos, logrando generar así una señal que mantiene las mismas caracteristicas pero en puntos específicos de muestreo. Durante este proceso es de importancia el teorema de Nysquit, el cual define marcos para poder obtener la señal lo mas fiel posible a la original, y no generar posibles efectos de aliasing, conocidos en el mundo de las señal digitales.
+
+    \item \textbf{Gráfico unificado:} En la figura (\ref{fig:signals_unificate}) se logran observar las tres figuras anteriror en una sola imagen. En base a lo señalado, se puede observar de mejor manera la similitud entre ambas señales, las cuales, comparadas con la señal original, mantienen la naturaleza de la misma. Esto certifica la correcta construcción de la actividad previa, dando como resultado una señal PAM natural y una PAM instantánea fiel a la señal original.
+\end{enumerate}
+
+\subsection{Actividad Principal: }
+\begin{enumerate}
+
+    \item \textbf{Transformadas de Fourier:} El dominio de las transformadas de Fourier está influenciada por el ciclo de trabajo del pulso utilizado, en relación a cómo se determina la duración de los pulsos en el muestreo, ya que un mayor ciclo de trabajo implica pulsos más anchos, lo que en el dominio de la frecuencia genera una envolvente más estrecha alrededor de las réplicas del espectro original, atenuando así sus componentes de alta frecuencia, miéntras que un menor ciclo, implica menos o nula anchura, incidiendo casi de ninguna manera en el espectro de frecuencia. En la figura (\ref{fig:signals_frequency}) se aprecian los espectros para las tres señales que describen estos comportamientos:
+    
+    \begin{itemize}
+        \item \textbf{Señal Original:} Su espectro está concentrado en bajas frecuencias, lo que era esperable por la naturaleza sinusoide.
+        \item \textbf{Señal PAM natural:} Presenta atenucaciones en torno a las frecuencias que se notan en el espectro, teniendo réplicas con respecto al original y con disminuciones en sus amplitudes. Esto se le atribuye a que tiene un mayor ciclo de trabajo, por lo que se atenuan las componentes de más frecuencia, tal y como se dijo anteriormente.
+        \item \textbf{Señal PAM instantánea:} Presentan pulsos sumamente estrechos, como impulsos de dirac, distribuidas de manera regular. Esto se debe dada la naturaleza de esta señal, que consiste en la multiplicación de estos trenes de impulso por el espectro original, determinado por intervalos definidos. Al no haber un ciclo de trabajo tan definido como la anterior, debido al ancho nulo, se concatenan en frecuencia secuencialmente, siendo iguales entre si.
+    \end{itemize}
+
+    Además, se observa que la frecuencia de muestreo determina la repetición espectral de la señal muestreada. Se sabe que la frecuencia de muestreo debe ser al menos el doble de la máxima frecuencia de la señal original para evitar el fenomeno del aliasing. Entonces con eso en consideración si la frecuencia es baja, se observa el aliasing y de ser una frecuencia alta la señal se conserva de mejor manera, ejemplificándose en ambos PAM (Natural e Instantáneo).
+
+    \item \textbf{Gráfico PCM y error de cuantización:} A partir de la Figura (\ref{fig:pam_quantization_error}), se muestra la señal original, el muestreo instantáneo y el muestreo cuantizado. El segundo es exacto, valores donde se toman puntos de la señal original de manera discreta, y el tercero es el valor permitido por los niveles de cuantización más cercano a la señal en términos digitales. Al aumentar los bits de cuantización, será mucho más cercano y fiel a la señal original, si se disminuyen, se alejarán más de lo estipulado, generando más errores en relación a este, tal y como se aprecia en la gráfica. Es por esto que su error varía exclusivamente de la cantidad definida de bits para cuantizar la gráfica (4 en este caso).
+
+\end{enumerate}
+%%corregir
+
+\section{Conclusión}
+
+A lo largo de esta experiencia, se logró analizar y comprender los procesos de modulación por amplitud de pulsos (PAM) y modulación por codificación de pulsos (PCM), así como la importancia de la digitalización de señales en sistemas de comunicación. Usando MATLAB, se generaron señales muestreadas y cuantizadas, viendo y analizando su comportamiento tanto en el dominio del tiempo como en el dominio de la frecuencias, gracias a las transformadas de Fourier, además de observar el error de cuantización. 
+
+Los resultados mostraron que los parametros de muestreo y la cuantización según cómo esté configurada en relación a los bits, tienen una gran incidencia en la representación y calidad de las señales. Se evidenció la importancia del teorema de Nyquist para evitar el aliasing y garantizar una correcta reconstrucción de las señales. En general, esta experiencia proporcionó una base sólida para entender los fundamentos de la transmisión digital y su impacto en la eficiencia y robustez de los sistemas de comunicación.
+
+Además, se pudo observar que según el tipo de modulación, ya sea PAM natural o PAM instantáneo, se generan diferentes espectros de frecuencia, lo que permite entender cómo la modulación afecta la representación de la señal en el dominio de la frecuencia. La modulación por codificación de pulsos (PCM) también demostró ser un proceso crucial para la digitalización de señales analógicas, permitiendo una representación más eficiente y robusta en sistemas digitales.
+
+En síntesis, el laboratorio proporcionó una profunda comprensión de los conceptos fundamentales de la modulación de la señal m(t), y de cómo las técnicas y metodologías empleadas influyen en las comunicaciones digitales. La experiencia adquirida es fundamental para pretenciones futuras en el campo, ya que permite entender su funcionamiento y a partir de estos, mejorarlos y optimizarlos. 
+
+%%corregir
+\newpage
+\section{Referencias}
+
+\begin{itemize}
+    \item Couch, L. W. \textit{Sistemas de comunicación digitales y analógicos}. 7ª edición, Pearson Educación, 2008.
+    
+    \item Lathi, B. \textit{Modern Digital and Analog Communication Systems}. 3ª edición, Oxford University Press, 2002.
+    
+    \item Sklar, Bernard. \textit{Digital Communications: Fundamentals and Applications}. 2ª edición, Prentice Hall, 2017.
+    
+    \item Stremler, Ferrel G. \textit{Sistemas de Comunicaciones}. Fondo Educativo Interamericano, 1985.
+\end{itemize}
+
+
+
+\newpage
+\section{Anexos}
+
+\subsection*{Código en Matlab}
+
+\begin{lstlisting}[language=MATLAB, caption=Código en MATLAB, label=lst:codigo]
+    % -------------------- Parametros de configuracion --------------------
+    fm = 100000; % Frecuencia de muestreo (Hz)
+    tm = 1/fm; % Periodo de muestreo (s)
+    ls = 200; % Largo de la senal
+    f_c = 1000; % Frecuencia de la senal (Hz)
+    f_s = 5000; % Frecuencia de muestreo teorico (Hz)
+    t_s = 1/f_s; % Periodo de muestreo teorico (s)
+    tau = 0.5*t_s; % Duracion del pulso (s)
+    d = tau/t_s; % Ciclo de trabajo
+    
+    % -------------------- Vectores de tiempo y senal original--------------------
+    t = (0:ls-1)*tm;
+    m_t = sin(2*pi*f_c*t);
+    
+    % -------------------- Auxiliares --------------------
+    r = floor(t_s/tm);
+    s = floor(tau/tm);
+    
+    % -------------------- Muestreo Natural de la senal --------------------
+    s_nat = zeros(1,length(t));
+    for i = 1:r:length(t)
+        if i+s <= length(t)
+            s_nat(i:i+s) = 1;
+        else
+            s_nat(i:end) = 1;
+        end
+    end
+    m_t_nat = m_t .* s_nat;
+    
+    % -------------------- Muestreo Instantaneo de la senal--------------------
+    m_t_inst = zeros(1, length(t));
+    indices_muestreo = 1:r:length(t);
+    m_t_inst(indices_muestreo) = m_t(indices_muestreo);
+    
+    % -------------------- PCM (Modulacion por Pulsos Codificados) --------------------
+    N = 4; % Numero de bits por palabra PCM (configurable)
+    Nniveles = 2^N; % Cantidad de niveles de cuantizacion
+    m_min = min(m_t_inst);
+    m_max = max(m_t_inst);
+    
+    % Cuantizacion uniforme
+    delta = (m_max - m_min) / (Nniveles - 1); % Paso de cuantizacion
+    m_t_cuant = round((m_t_inst - m_min) / delta) * delta + m_min; % Senal cuantizada
+    
+    % Error de cuantizacion
+    e_cuant = m_t_inst - m_t_cuant;
+    
+    % -------------------- FFT --------------------
+    M_t = fft(m_t);
+    M_t_nat = fft(m_t_nat);
+    M_t_inst = fft(m_t_inst);
+    % Frequency axis for plotting
+    f_axis = (0:(length(t) - 1)) * (1 / (ls * tm));
+    
+    % -------------------- GRAFICAS --------------------
+    % Figura 1: Senales en el tiempo
+    figure;
+    
+    subplot(3,1,1);
+    plot(t, m_t, 'b');
+    title('Senal Original');
+    xlabel('Tiempo (s)');
+    ylabel('Amplitud');
+    grid on;
+    
+    subplot(3,1,2);
+    plot(t, m_t_nat, '-r');
+    title('Muestreo Natural');
+    xlabel('Tiempo (s)');
+    ylabel('Amplitud');
+    grid on;
+    
+    subplot(3,1,3);
+    stem(t(indices_muestreo), m_t(indices_muestreo), 'or');
+    title('Muestreo Instantaneo (Puntos)');
+    xlabel('Tiempo (s)');
+    ylabel('Amplitud');
+    grid on;
+    
+    % Figura 2: Transformadas de Fourier
+    figure;
+    
+    subplot(3,1,1);
+    plot(f_axis, abs(M_t), 'b');
+    title('Espectro de la Senal Original');
+    xlabel('Frecuencia (Hz)');
+    ylabel('Magnitud');
+    grid on;
+    
+    subplot(3,1,2);
+    plot(f_axis, abs(M_t_nat), '-r');
+    title('Espectro del Muestreo Natural');
+    xlabel('Frecuencia (Hz)');
+    ylabel('Magnitud');
+    grid on;
+    
+    subplot(3,1,3);
+    plot(f_axis, abs(M_t_inst), '-g');
+    title('Espectro del Muestreo Instantaneo (corregido)');
+    xlabel('Frecuencia (Hz)');
+    ylabel('Magnitud');
+    grid on;
+    
+    % Figura 3: PCM y cuantizacion
+    figure;
+    
+    subplot(2,1,1);
+    plot(t, m_t, 'b', t(indices_muestreo), m_t_inst(indices_muestreo), 'or', t(indices_muestreo), m_t_cuant(indices_muestreo), 'xg');
+    title('Senal Original, PAM Instantaneo y Cuantizado');
+    legend('Original', 'Muestreo Instantaneo', 'Cuantizado');
+    xlabel('Tiempo (s)');
+    ylabel('Amplitud');
+    grid on;
+    
+    subplot(2,1,2);
+    stem(t(indices_muestreo), e_cuant(indices_muestreo), 'r');
+    title('Error de Cuantizacion PCM');
+    xlabel('Tiempo (s)');
+    ylabel('Error');
+    grid on;
+    
+
+\end{lstlisting}
+
+\newpage
+
+\subsection*{Imagenes de las señales por separado:}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/GraficasOr.png}
+    \caption{Señales en el tiempo (Original, Muestreo Natural y Muestreo Instantáneo)}
+    \label{fig:signals_time}
+\end{figure}
+
+\newpage
+
+\subsection*{Imagenes de las señales por separado:}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/graficoUnificado.png}
+    \caption{Señales unificadas}
+    \label{fig:signals_unificate}
+\end{figure}
+\newpage
+
+\subsection*{Imagenes de las transformadas de Fourier:}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/GraficasFFT.png}
+    \caption{Señales en Frecuencia (FFT)}
+    \label{fig:signals_frequency}
+\end{figure}
+
+\newpage
+\subsection*{Imagenes de la señal PAM y el error de cuantización:}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/GraficasPAMyErrores.png}
+    \caption{Señal PAM y error de cuantización}
+    \label{fig:pam_quantization_error}
+\end{figure}
+
+
+\end{document}
